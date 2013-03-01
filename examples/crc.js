@@ -32,11 +32,12 @@ buf[4] = "0x01";  // version minor
 //buf[7] ="0x21";  // CRC
 //buf[8] ="0xAC";  // CRC
 
-var myCRC = crc.buffer.crc16(buf);
+var msgCRC = crc.buffer.crc16(buf);
+console.log(msgCRC.toString(16));
 
-console.log(myCRC)
+console.log(msgCRC)
 
-console.log(myCRC.toString(16))
+
 
 var str = "01 03 00 00 01";
 var num = 0103000001;
