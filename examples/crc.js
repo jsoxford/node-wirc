@@ -1,19 +1,14 @@
-var crc = require('crc');
-//console.log('cock')
+// for reference. this script is self contained.
+// it is for playing with different ways to make the crc
 
-var Buffer = require('buffer').Buffer;
+var crc     = require('crc');
+var tools   = require('../lib/tools');
+var Buffer  = require('buffer').Buffer;
 
 var buf = new Buffer(5);
-// buf = [ 0x01,                  // command
-//         0x00,                  // uh, there was an extra NULL in the wiresharp dump, so...
-//         0x1d,                  // protocol version (29)
-//         this.name.length,      // username length
-//         this.name,             // my username
-//         0x00, 0x00, 0x00, 0x00, 0x00, 0x00    // unused
-//     ];
 
-//buf[0] ="0xAA";  // frame prefix
-//buf[1] ="0xBB";  // frame prefix
+//buf[0] ="0xAA";  // frame prefix - not included in crc
+//buf[1] ="0xBB";  // frame prefix - not included in crc
 buf[0] = "0x01";  // CMD
 buf[1] = "0x03";  // LEN
 buf[2] = "0x00";  // device type - PC
@@ -33,12 +28,16 @@ buf[4] = "0x01";  // version minor
 //buf[8] ="0xAC";  // CRC
 
 var msgCRC = crc.buffer.crc16(buf);
+
 console.log(msgCRC.toString(16));
 
 console.log(msgCRC)
 
-
-
-var str = "01 03 00 00 01";
+// not got any of this to work yet.
+// only the buffer version above works
+var str = "0x01 0x03 0x00 0x00 0x01";
 var num = 0103000001;
-console.log(crc.crc16(str))
+var arr = [01,03,00,00,01];
+var altstr = "1 3 0 0 1";
+var shortNum = "131";
+console.log(crc.crc16(altstr))

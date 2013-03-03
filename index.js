@@ -6,7 +6,7 @@ exports.UdpControl       = require('./lib/control/UdpControl');
 
 exports.createClient = function(options) {
   var client = new wirc.Client(options);
-  client.resume();
+  //client.resume();
   return client;
 };
 

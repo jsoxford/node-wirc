@@ -1,3 +1,6 @@
+// for reference. this script is self contained.
+// it shows a basic receive server
+
 var Buffer = require('buffer').Buffer;
 var dgram = require('dgram');
 var log = require('sys').log;

@@ -1,3 +1,6 @@
+// for reference. this script is self contained.
+// it shows a basic sending.
+
 var Buffer = require('buffer').Buffer;
 var dgram = require('dgram');
 

@@ -1,3 +1,6 @@
+// for reference. this script is self contained.
+// it shows the steps needed to send and recieve a discovery command
+
 // get local ip address
 var os = require('os');
 var interfaces = os.networkInterfaces();
@@ -25,11 +28,11 @@ receivesock.bind(25561, addresses[0]);
 //.toString('ascii', 0, rinfo.size)
 
 // set up sender
-// 
+//
 // The BCSD message is intended to be broadcasted
 // Command Code (CMD):0x01
 // Message Body Length (LEN): 3
-// Fields in the message body: 
+// Fields in the message body:
 //  1. [0] Sys (1 byte): Transmitter system type (0:PC client, 1: iPhone, 2: Android)
 //  2. [1..2] Version (2 bytes): Version number of the transmitter first byte is the major version and the second is the minor version number.
 // CRC
