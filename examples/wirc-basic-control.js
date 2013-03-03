@@ -3,5 +3,8 @@
 var Client = require('../lib/Client');
 
 var client = new Client();
+client.resume();
 
 client.forward(2);
+
+//client.finish();
