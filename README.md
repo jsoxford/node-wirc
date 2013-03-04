@@ -7,6 +7,8 @@ http://wirc.dension.com/
 
 This is is no way affiliated with Denison.
 
+It also doesn't work ;)
+
 ----
 
 MIT - see LICENSE.md 
