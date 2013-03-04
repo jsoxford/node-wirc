@@ -1,0 +1,28 @@
+{
+    "name":"wirc",
+    "version":"0.1.0",
+    "description":"Node module for communicating with WiRC - Wifi radio controlled car",
+    "homepage":"https://github.com/jsoxford/node-wirc",
+    "author": {
+        "name": "Kevin Carmody",
+        "url": "http://www.whiteoctober.co.uk"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com:jsoxford/node-wirc.git"
+    },
+    "main": "./index",
+    "dependencies": {
+        "buffy": "0.0.4",
+        "crc" : "git://github.com/alexgorbatchev/node-crc.git"
+    },
+    "licenses": [
+        {
+            "type": "MIT",
+            "url":""
+        }
+    ],
+    "engines": {
+        "node": "*"
+    }
+}
