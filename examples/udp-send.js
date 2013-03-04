@@ -8,7 +8,7 @@ var sock = dgram.createSocket("udp4");
 
 var buf = new Buffer(256);
 
-buf[0] = "0x21";
+buf[0] = 33;
 buf[1] = "0x18";
 buf[3] = "0x708";
 buf[4] = "0x708";
