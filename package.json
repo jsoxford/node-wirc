@@ -13,7 +13,6 @@
     },
     "main": "./index",
     "dependencies": {
-        "buffy": "0.0.4",
         "crc" : "git://github.com/alexgorbatchev/node-crc.git"
     },
     "licenses": [
