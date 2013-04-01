@@ -5,12 +5,24 @@ var net = require('net');
 var Q = require('./vendor/q');
 var os = require('os');
 
-var bindPort = 24454;
-var configPort = 1984;
+// Binds a function to an object
+var bind = function(object, fn) {
+    return function() { return fn.apply(object, arguments); };
+};
+
+// Fills an array with a particular value
+var fill = function(value, length) {
+    var array = []
+    for (var i = 0; i < length; i++) {
+        array.push(value);
+    }
+    return array;
+};
 
 // Ports for recieving data (largely arbitrary)
 var localPorts = {
     discovery: 24454,
+    control: 24454,
     status: 24455
 };
 
@@ -18,8 +30,7 @@ var localPorts = {
 var remotePorts = {
     discovery: 1984,
     config: 1984,
-    control: null,
-    status: null
+    control: null
 }
 
 // Gets all IPs assigned to this machine
@@ -40,33 +51,18 @@ var device = {
     version: [0, 1],
     priority: 0xff,
     transmitterName: 'node-wirc',
-    statusPort: 24455
+    statusPort: localPorts.status
 };
 
 // Time periods for servo outputs
-var channelConfig = {
-    timePeriods: [15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000, 15000]
-};
+var channelConfig = {timePeriods: fill(15000, 12)};
 
 // Default values for outputs when not sent a signal
-// 0 is off, 255 is last known value
-var failsafeConfig = {
-    channelValues: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-};
-
-// Values to be sent to the device initially
-var initialValues = function() {
-    return [1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500]
-};
+var failsafeConfig = {channelValues: fill(0, 12)};
 
 var midPoint = 1500;
 var rateChange = 3;
 var interiaDelay = 0;
-
-// Binds a function to an object
-var bind = function(object, fn) {
-    return function() { return fn.apply(object, arguments); };
-};
 
 // Discovery
 var Client = {
@@ -78,12 +74,12 @@ var Client = {
         addresses.forEach(function(address) {
             // Sets up a broadcast socket
             var socket = dgram.createSocket('udp4');
-            socket.bind(bindPort, address);
+            socket.bind(localPorts.discovery, address);
             socket.setBroadcast(true);
 
             // Sends the broadcast discover command
             var buffer = commandManager.encode('broadcastDiscover', device);
-            socket.send(buffer, 0, buffer.length, configPort, "255.255.255.255");
+            socket.send(buffer, 0, buffer.length, remotePorts.discovery, "255.255.255.255");
             socket.on('message', function(buffer, info) {
                 // Recieves the command and fulfills the promise
                 var response = commandManager.decode(buffer);
@@ -106,7 +102,7 @@ var Client = {
         // Sets up a TCP socket
         var socket = new net.Socket();
         var deviceInfo = this.devices[serialNumber];
-        socket.connect(configPort, deviceInfo.remoteAddress);
+        socket.connect(remotePorts.config, deviceInfo.remoteAddress);
 
         // Sends all mandatory config commands
         socket.on('connect', function() {
@@ -124,7 +120,7 @@ var Client = {
         socket.on('data', function(buffer) {
             var response = commandManager.decode(buffer);
             if (response.command == 'loginComplete') {
-                self.controlPort = response.controlPort;
+                remotePorts.control = response.controlPort;
                 self.serialNumber = serialNumber;
                 deferred.resolve();
             }
@@ -139,7 +135,7 @@ var Client = {
 
         var socket = dgram.createSocket('udp4');
         var deviceInfo = this.devices[this.serialNumber];
-        socket.bind(bindPort);
+        socket.bind(localPorts.control);
 
         // Poll car with control signal
         clearInterval(this.controlPolling);
@@ -150,6 +146,8 @@ var Client = {
 
                     if (directionChange && interiaDelay <= 0) {
                         interiaDelay = 35;
+                        // TODO: more testing of this part
+                        //interiaDelay = parseInt(Math.abs(midPoint - Client.actualChannels[i]) / rateChange);
                     }
                     if (interiaDelay > 0) interiaDelay--;
 
@@ -160,7 +158,7 @@ var Client = {
             });
 
             var buffer = commandManager.encode('controlChannels', {channelValues: Client.actualChannels});
-            socket.send(buffer, 0, buffer.length, self.controlPort, deviceInfo.remoteAddress);
+            socket.send(buffer, 0, buffer.length, remotePorts.control, deviceInfo.remoteAddress);
         }, 15);
 
         deferred.resolve();
@@ -168,8 +166,8 @@ var Client = {
     },
 
     devices: {},
-    channels: initialValues(),
-    actualChannels: initialValues()
+    channels: fill(1500, 12),
+    actualChannels: fill(1500, 12)
 }
 
 Client.discover(addresses)
@@ -180,7 +178,6 @@ Client.discover(addresses)
         setInterval(function() {
             var oscillation = Math.sin(i/100);
             Client.channels[0] = 1500 - parseInt(300 * oscillation);
-            Client.channels[1] = 1500 + parseInt(100 * oscillation);
             i++;
         }, 15);
 
