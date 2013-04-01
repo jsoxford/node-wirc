@@ -37,7 +37,7 @@ module.exports = function(commands) {
     var findCommand = function(code) {
         for (i in CommandManager.commands) {
             if (CommandManager.commands[i].command.code == code) {
-                return CommandManager.commands[i]
+                return i;
             }
         }
     };
@@ -106,7 +106,7 @@ module.exports = function(commands) {
             for (var i = 0; i < length ; i++) {
                 offset = decoders.int(buffer, offset, string, i, 1);
             }
-            data[key] = String.fromCharCode.apply(this, string).replace(/\u0000/g, "");
+            data[key] = String.fromCharCode.apply(this, string).replace(/\u0000.*$/g, "");
             return offset;
         },
 
@@ -166,10 +166,11 @@ module.exports = function(commands) {
     CommandManager.decode = function(buffer) {
 
         var code = buffer.readUInt8(2);
-        var config = findCommand(code);
+        var command = findCommand(code);
+        var config = CommandManager.commands[command];
         if (!config) throw 'Unknown command code "'+code+'" to decode';
 
-        var data = {};
+        var data = {command: command};
         var offset = 4;
 
         // Encode values into the buffer
