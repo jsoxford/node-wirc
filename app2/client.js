@@ -160,10 +160,10 @@ module.exports = function(options) {
 
         // Sets up a UDP socket
         var socket = dgram.createSocket('udp4');
-        var device = this.chosenDevice();
         socket.bind(self.localPorts.control);
 
         // Poll device with control signal
+        var device = this.chosenDevice();
         this.controlPolling = setInterval(function() {
 
             self.actualChannels = self.desiredChannels.map(function(channel, i) {
@@ -178,6 +178,22 @@ module.exports = function(options) {
         deferred.resolve();
         return deferred.promise;
     };
+
+    client.startCamera = function(id, fn) {
+        var self = this;
+
+        var socket = dgram.createSocket('udp4');
+        socket.bind(self.localPorts.camera);
+
+        var device = this.chosenDevice();
+        var buffer = commandManager.encode('startCameraStream', {id: id, cameraPort: self.localPorts.camera});
+        socket.send(buffer, 0, buffer.length, self.remotePorts.control, device.remoteAddress);
+
+        socket.on('message', function(buffer) {
+            var data = commandManager.decodeJpeg(buffer);
+            fn.call(self, data);
+        });
+    }
 
     client.monitorStatus = function() {
         var self = this;
