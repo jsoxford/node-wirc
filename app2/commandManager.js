@@ -27,6 +27,7 @@
 module.exports = function(commands) {
 
     var crc = require('crc');
+    var fs = require('fs');
     var Buffer = require('buffer').Buffer;
     var CommandManager = {commands: commands};
 
@@ -128,7 +129,7 @@ module.exports = function(commands) {
 
         // Compute buffer length
         var length = config.fields.reduce(function(a, b) {
-            return a + b.length * (b.repeats || 1);
+            return a + (b.length || 1) * (b.repeats || 1);
         }, 0);
 
         // Actual buffer length must include frame, command, length and CRC
@@ -151,10 +152,10 @@ module.exports = function(commands) {
                 }
 
                 for (var i = 0; i < field.repeats; i++) {
-                    offset = encoders[field.type](buffer, offset, data[field.name][i], field.length);
+                    offset = encoders[field.type](buffer, offset, data[field.name][i], field.length || 1);
                 }
             }
-            else offset = encoders[field.type](buffer, offset, data[field.name], field.length);
+            else offset = encoders[field.type](buffer, offset, data[field.name], field.length || 1);
         });
 
         // Find CRC
@@ -190,6 +191,32 @@ module.exports = function(commands) {
         // TODO: validate checksum here
 
         return data;
+    };
+
+    CommandManager.decodeJpeg = function(buffer) {
+        var config = CommandManager.commands.jpegStream;
+        var data = {};
+        var offset = 0;
+
+        // Encode values into the buffer
+        config.fields.map(function(field) {
+            if (!encoders[field.type]) throw 'Unknown decoder "'+field.type+'"';
+
+            if (field.repeats) {
+                var array = [];
+                for (var i = 0; i < field.repeats; i++) {
+                    offset = decoders[field.type](buffer, offset, array, i, field.length || 1);
+                }
+                data[field.name] = array;
+            }
+            else offset = decoders[field.type](buffer, offset, data, field.name, field.length || 1);
+        });
+
+        // TODO: This only supports one packet per frame
+        data.image = buffer.slice(16);
+
+        return data;
+
     };
 
     return CommandManager;

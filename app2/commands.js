@@ -7,8 +7,8 @@ module.exports = {
             code : 0x01
         },
         fields: [
-            {name: 'deviceType', type: 'int', length: 1},
-            {name: 'version', type: 'int', length: 1, repeats: 2}
+            {name: 'deviceType', type: 'int'},
+            {name: 'version', type: 'int', repeats: 2}
         ]
     },
     broadcastRespond: {
@@ -18,8 +18,8 @@ module.exports = {
             code : 0x02
         },
         fields: [
-            {name: 'hardwareVersion', type: 'int', length: 1, repeats: 2},
-            {name: 'softwareVersion', type: 'int', length: 1, repeats: 2},
+            {name: 'hardwareVersion', type: 'int', repeats: 2},
+            {name: 'softwareVersion', type: 'int', repeats: 2},
             {name: 'deviceName', type: 'string', length: 64},
             {name: 'serialNumber', type: 'string', length: 7}
         ]
@@ -31,9 +31,9 @@ module.exports = {
             code:  0x11
         },
         fields: [
-            {name: 'deviceType', type: 'int', length: 1},
-            {name: 'version', type: 'int', length: 1, repeats: 2},
-            {name: 'priority', type: 'int', length: 1},
+            {name: 'deviceType', type: 'int'},
+            {name: 'version', type: 'int', repeats: 2},
+            {name: 'priority', type: 'int'},
             {name: 'transmitterName', type: 'string', length: 64},
             {name: 'statusPort', type: 'int', length: 2}
         ]
@@ -72,8 +72,8 @@ module.exports = {
             code : 0x1A
         },
         fields: [
-            {name: 'id', type: 'int', length: 1},
-            {name: 'cameraCount', type: 'int', length: 1},
+            {name: 'id', type: 'int'},
+            {name: 'cameraCount', type: 'int'},
             {name: 'controlPort', type: 'int', length: 2}
         ]
     },
@@ -93,7 +93,7 @@ module.exports = {
         },
         fields: [
             {name: 'batteries', type: 'int', length: 2, repeats: 2},
-            {name: 'digitalInputs', type: 'int', length: 1, repeats: 4}
+            {name: 'digitalInputs', type: 'int', repeats: 4}
         ]
     },
     wifiConfig: {
@@ -104,9 +104,9 @@ module.exports = {
         fields: [
             {name: 'ssid', type: 'string', length: 32},
             {name: 'password', type: 'string', length: 64},
-            {name: 'accessPoint', type: 'boolean', length: 1},
-            {name: 'secured', type: 'boolean', length: 1},
-            {name: 'channel', type: 'int', length: 1},
+            {name: 'accessPoint', type: 'boolean'},
+            {name: 'secured', type: 'boolean'},
+            {name: 'channel', type: 'int'},
             {name: 'country', type: 'string', length: 2}
         ]
     },
@@ -125,8 +125,8 @@ module.exports = {
             code:  0x33
         },
         fields: [
-            {name: 'id', type: 'int', length: 1},
-            {name: 'priority', type: 'int', length: 1},
+            {name: 'id', type: 'int'},
+            {name: 'priority', type: 'int'},
             {name: 'transmitterName', type: 'string', length: 64}
         ]
     },
@@ -145,7 +145,7 @@ module.exports = {
             code : 0xFF
         },
         fields: [
-            {name: 'commandCode', type: 'int', length: 1},
+            {name: 'commandCode', type: 'int'},
             {name: 'errorCode', type: 'int', length: 2}
         ]
     },
@@ -170,17 +170,29 @@ module.exports = {
         },
         fields: []
     },
-    STST: {
+    startCameraStream: {
         command: {
             name: 'STST',
             code : 0x41
         },
-        fields: []
+        fields: [
+            {name: 'id', type: 'int'},
+            {name: 'cameraPort', type: 'int', length: 2}
+        ]
+    },
+    jpegStream: {
+        fields: [
+            {name: 'lastPacket', type: 'int', length: 2},
+            {name: 'protocolVersion', type: 'null', length: 2},
+            {name: 'frameIndex', type: 'int', length: 4},
+            {name: 'packetIndex', type: 'int', length: 4},
+            {name: 'length', type: 'int', length: 4}
+        ]
     },
     EST: {
         command: {
             name: 'EST',
-            code : 0x42
+            code: 0x42
         },
         fields: []
     }
