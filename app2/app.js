@@ -36,6 +36,7 @@ var client = clientCreator({
     }
 });
 
+// Custom code for your app
 client.discover()
     .then(bind(client, client.connect))
     .then(bind(client, client.monitorStatus))
@@ -43,17 +44,19 @@ client.discover()
     .then(function() {
         var device = client.chosenDevice();
 
+        // Moves steering left and right
         var i = 0
         setInterval(function() {
             client.steer(Math.sin(i/50));
             i++;
         }, 15);
 
+        // This hacky code gets the camera image pixels, via imagemagick
         var i = 0;
         var socket = dgram.createSocket('udp4');
-        socket.bind(localPorts.camera);
-        var buffer = commandManager.encode('startCameraStream', {id: 0, cameraPort: localPorts.camera});
-        socket.send(buffer, 0, buffer.length, remotePorts.control, device.remoteAddress);
+        socket.bind(client.localPorts.camera);
+        var buffer = commandManager.encode('startCameraStream', {id: 0, cameraPort: client.localPorts.camera});
+        socket.send(buffer, 0, buffer.length, client.remotePorts.control, device.remoteAddress);
         socket.on('message', function(buffer) {
             var data = commandManager.decodeJpeg(buffer);
             fs.open('img.jpg', 'w', function(err, fd) {
@@ -68,11 +71,4 @@ client.discover()
                 });
             });
         });
-
-        // setTimeout(function() { client.channels[1] = 1600; }, 1000);
-        // setTimeout(function() { client.channels[1] = 1300; }, 3000);
-        // setTimeout(function() { client.channels[1] = 1600; }, 4000);
-        // setTimeout(function() { client.channels[1] = 1000; }, 5000);
-        // setTimeout(function() { client.channels[1] = 2000; }, 6000);
-        // setTimeout(function() { client.channels[1] = 1500; }, 7000);
     });
