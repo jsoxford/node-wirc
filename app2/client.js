@@ -5,6 +5,7 @@ var dgram = require('dgram');
 var os = require('os');
 var net = require('net');
 
+
 // Fills an array with a particular value
 var fill = function(value, length) {
     var array = []
@@ -31,7 +32,6 @@ module.exports = function(options) {
     client.localPorts = {
         discovery: 24454,
         control: 24454,
-        status: 24455,
         camera: 24456
     };
 
@@ -47,8 +47,7 @@ module.exports = function(options) {
         deviceType: 0,
         version: [0, 1],
         priority: 0xff,
-        transmitterName: 'node-wirc',
-        statusPort: client.localPorts.status
+        transmitterName: 'node-wirc'
     };
 
     // Sets filters for channels
@@ -122,6 +121,19 @@ module.exports = function(options) {
         // This defines the device we are trying to connect to
         self.serialNumber = serialNumber;
 
+        // Create a socket to listen for status messages on
+        var status = dgram.createSocket('udp4');
+
+        status.on('message', function(buffer) {
+            var response = commandManager.decode(buffer);
+            self.batteries = response.batteries;
+            self.digitalInputs = response.digitalInputs;
+        })
+        .bind();
+
+        // add the port to be sent to device settings
+        self.deviceSettings.statusPort = status.address().port;
+
         // Sets up a TCP socket
         var socket = new net.Socket();
         var device = this.chosenDevice();
@@ -194,19 +206,6 @@ module.exports = function(options) {
             fn.call(self, data);
         });
     }
-
-    client.monitorStatus = function() {
-        var self = this;
-
-        // Set up socket to recieve status updates
-        var socket = dgram.createSocket('udp4');
-        socket.bind(self.localPorts.status);
-        socket.on('message', function(buffer) {
-            var response = commandManager.decode(buffer);
-            self.batteries = response.batteries;
-            self.digitalInputs = response.digitalInputs;
-        });
-    };
 
     client.chosenDevice = function() {
         return this.devices[this.serialNumber];
