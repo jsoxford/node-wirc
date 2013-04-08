@@ -4,6 +4,7 @@ var Q = require('./vendor/q');
 var dgram = require('dgram');
 var os = require('os');
 var net = require('net');
+var fs = require('fs');
 
 
 // Fills an array with a particular value
@@ -31,8 +32,7 @@ module.exports = function(options) {
     // Ports for recieving data (largely arbitrary)
     client.localPorts = {
         discovery: 24454,
-        control: 24454,
-        camera: 24456
+        control: 24454
     };
 
     // Ports for sending signals to the device
@@ -139,6 +139,10 @@ module.exports = function(options) {
         var device = this.chosenDevice();
         socket.connect(self.remotePorts.config, device.remoteAddress);
 
+        // store the control socket for 
+        // starting the camera
+        self._ctrl = socket;
+
         // Sends all mandatory config commands
         socket.on('connect', function() {
             var buffer = commandManager.encode('transmitterLogin', self.deviceSettings);
@@ -191,21 +195,25 @@ module.exports = function(options) {
         return deferred.promise;
     };
 
+
+    // initiate a video stream and call back with the jpgs
     client.startCamera = function(id, fn) {
-        var self = this;
 
-        var socket = dgram.createSocket('udp4');
-        socket.bind(self.localPorts.camera);
-
-        var device = this.chosenDevice();
-        var buffer = commandManager.encode('startCameraStream', {id: id, cameraPort: self.localPorts.camera});
-        socket.send(buffer, 0, buffer.length, self.remotePorts.control, device.remoteAddress);
-
-        socket.on('message', function(buffer) {
+        // listen out for the video stream
+        var socket = dgram.createSocket("udp4");
+        socket.on('message', function(buffer){
             var data = commandManager.decodeJpeg(buffer);
             fn.call(self, data);
+        })
+        .bind();
+
+        var buffer = commandManager.encode('startCameraStream', {
+            id: id || 0,
+            cameraPort: socket.address().port
         });
-    }
+
+        this._ctrl.write(buffer);
+    };
 
     client.chosenDevice = function() {
         return this.devices[this.serialNumber];
