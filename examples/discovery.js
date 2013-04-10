@@ -3,6 +3,7 @@
 
 // get local ip address
 var os = require('os');
+
 var interfaces = os.networkInterfaces();
 var addresses = [];
 for (k in interfaces) {
@@ -21,11 +22,14 @@ var dgram = require('dgram');
 var log = require('sys').log;
 var receivesock = dgram.createSocket("udp4", function(msg, rinfo){
     log('got message ' + rinfo.address + ':' + rinfo.port);
-    log('data ln: ' + rinfo.size + " data: " + msg.toString('hex'))
-});
-receivesock.bind(25561, addresses[0]);
+    log('data ln: ' + rinfo.size + " data: " + msg.toString('hex'));
 
-//.toString('ascii', 0, rinfo.size)
+    receivesock.close();
+});
+receivesock.bind();
+
+
+var port = receivesock.address().port;
 
 // set up sender
 //
@@ -38,21 +42,26 @@ receivesock.bind(25561, addresses[0]);
 // CRC
 var buf = new Buffer(9);
 
-buf[0] ="0xAA";  // frame prefix
-buf[1] ="0xBB";  // frame prefix
-buf[2] ="0x01";  // CMD
-buf[3] ="0x03";  // LEN
-buf[4] ="0x00";  // device type - PC
-buf[5] ="0x00";  // version major
-buf[6] ="0x01";  // version minor
-buf[7] ="0x21";  // CRC = 33
-buf[8] ="0xAC";  // CRC
-
-var sendsock = dgram.createSocket("udp4");
-sendsock.bind(25561);
-sendsock.setBroadcast(true);
-sendsock.send(buf, 0, 9, 1984, "255.255.255.255", function(err, bytes){
-    sendsock.close();
-});
+buf[0] = 0xAA;  // frame prefix
+buf[1] = 0xBB;  // frame prefix
+buf[2] = 0x01;  // CMD
+buf[3] = 0x03;  // LEN
+buf[4] = 0x00;  // device type - PC
+buf[5] = 0x00;  // version major
+buf[6] = 0x01;  // version minor
+buf[7] = 0x21;  // CRC = 33
+buf[8] = 0xAC;  // CRC
 
 
+// broadcast discovery message on an interface
+function broadcast(address){
+    console.log(address);
+    var sendsock = dgram.createSocket("udp4");
+    sendsock.bind(port,address);
+    sendsock.setBroadcast(true);
+    sendsock.send(buf, 0, 9, 1984, "255.255.255.255", function(err, bytes){
+        sendsock.close();
+    });
+}
+
+addresses.forEach(broadcast);
