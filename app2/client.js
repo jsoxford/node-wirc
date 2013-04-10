@@ -4,6 +4,8 @@ var Q = require('./vendor/q');
 var dgram = require('dgram');
 var os = require('os');
 var net = require('net');
+var fs = require('fs');
+
 
 // Fills an array with a particular value
 var fill = function(value, length) {
@@ -30,9 +32,7 @@ module.exports = function(options) {
     // Ports for recieving data (largely arbitrary)
     client.localPorts = {
         discovery: 24454,
-        control: 24454,
-        status: 24455,
-        camera: 24456
+        control: 24454
     };
 
     // Ports for sending signals to the device
@@ -47,8 +47,7 @@ module.exports = function(options) {
         deviceType: 0,
         version: [0, 1],
         priority: 0xff,
-        transmitterName: 'node-wirc',
-        statusPort: client.localPorts.status
+        transmitterName: 'node-wirc'
     };
 
     // Sets filters for channels
@@ -122,10 +121,27 @@ module.exports = function(options) {
         // This defines the device we are trying to connect to
         self.serialNumber = serialNumber;
 
+        // Create a socket to listen for status messages on
+        var status = dgram.createSocket('udp4');
+
+        status.on('message', function(buffer) {
+            var response = commandManager.decode(buffer);
+            self.batteries = response.batteries;
+            self.digitalInputs = response.digitalInputs;
+        })
+        .bind();
+
+        // add the port to be sent to device settings
+        self.deviceSettings.statusPort = status.address().port;
+
         // Sets up a TCP socket
         var socket = new net.Socket();
         var device = this.chosenDevice();
         socket.connect(self.remotePorts.config, device.remoteAddress);
+
+        // store the control socket for 
+        // starting the camera
+        self._ctrl = socket;
 
         // Sends all mandatory config commands
         socket.on('connect', function() {
@@ -179,33 +195,24 @@ module.exports = function(options) {
         return deferred.promise;
     };
 
+
+    // initiate a video stream and call back with the jpgs
     client.startCamera = function(id, fn) {
-        var self = this;
 
-        var socket = dgram.createSocket('udp4');
-        socket.bind(self.localPorts.camera);
-
-        var device = this.chosenDevice();
-        var buffer = commandManager.encode('startCameraStream', {id: id, cameraPort: self.localPorts.camera});
-        socket.send(buffer, 0, buffer.length, self.remotePorts.control, device.remoteAddress);
-
-        socket.on('message', function(buffer) {
+        // listen out for the video stream
+        var socket = dgram.createSocket("udp4");
+        socket.on('message', function(buffer){
             var data = commandManager.decodeJpeg(buffer);
             fn.call(self, data);
-        });
-    }
+        })
+        .bind();
 
-    client.monitorStatus = function() {
-        var self = this;
-
-        // Set up socket to recieve status updates
-        var socket = dgram.createSocket('udp4');
-        socket.bind(self.localPorts.status);
-        socket.on('message', function(buffer) {
-            var response = commandManager.decode(buffer);
-            self.batteries = response.batteries;
-            self.digitalInputs = response.digitalInputs;
+        var buffer = commandManager.encode('startCameraStream', {
+            id: id || 0,
+            cameraPort: socket.address().port
         });
+
+        this._ctrl.write(buffer);
     };
 
     client.chosenDevice = function() {

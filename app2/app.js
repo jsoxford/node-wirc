@@ -35,7 +35,6 @@ var client = clientCreator({
 // Custom code for your app
 client.discover()
     .then(bind(client, client.connect))
-    .then(bind(client, client.monitorStatus))
     .then(bind(client, client.enable))
     .then(function() {
         var device = client.chosenDevice();
