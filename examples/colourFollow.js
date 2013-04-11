@@ -1,4 +1,4 @@
-var client = require('../car');
+var client = require('../lib/car');
 var childProcess = require('child_process');
 var rgb2hsl = require('color-convert').rgb2hsl;
 

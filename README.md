@@ -7,8 +7,8 @@ http://wirc.dension.com/
 
 This is is no way affiliated with Denison.
 
-To get started, try out the demo `examples/wirc-basic-control.js`. WARNING As it stands, as soon as you run it the module will automatically log in and run the car at full belt with no way of stopping it!!!
+To get started, try out the examples, for instance `examples/browserStream.js` will stream the car's camera to a browser at `http:localhost:8000`.
 
 ----
 
-MIT - see LICENSE.md 
+MIT - see LICENSE.md

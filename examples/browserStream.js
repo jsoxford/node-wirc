@@ -1,4 +1,4 @@
-var client = require('../car');
+var client = require('../lib/car');
 var http = require('http');
 
 client.discover()

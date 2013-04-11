@@ -1,6 +1,6 @@
-var client = require('../car');
+var client = require('../lib/car');
 var childProcess = require('child_process');
-var koki = require("./koki");
+var koki = require("../lib/koki");
 
 client.discover()
     .then(function(serialNumber) { return client.connect(serialNumber); })
