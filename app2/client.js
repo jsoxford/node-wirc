@@ -4,8 +4,6 @@ var Q = require('./vendor/q');
 var dgram = require('dgram');
 var os = require('os');
 var net = require('net');
-var fs = require('fs');
-
 
 // Fills an array with a particular value
 var fill = function(value, length) {
@@ -89,6 +87,8 @@ module.exports = function(options) {
             }
         }
 
+        addresses = [addresses[1]];
+
         // Performs broadcast discovery on each interface
         addresses.forEach(function(address) {
             // Sets up a broadcast socket
@@ -139,7 +139,7 @@ module.exports = function(options) {
         var device = this.chosenDevice();
         socket.connect(self.remotePorts.config, device.remoteAddress);
 
-        // store the control socket for 
+        // store the control socket for
         // starting the camera
         self._ctrl = socket;
 
@@ -192,27 +192,31 @@ module.exports = function(options) {
         }, 15);
 
         deferred.resolve();
+
         return deferred.promise;
     };
 
 
     // initiate a video stream and call back with the jpgs
     client.startCamera = function(id, fn) {
+        var self = this;
+        var device = self.chosenDevice();
 
-        // listen out for the video stream
+        // Listen out for the video stream
         var socket = dgram.createSocket("udp4");
-        socket.on('message', function(buffer){
-            var data = commandManager.decodeJpeg(buffer);
-            fn.call(self, data);
-        })
-        .bind();
+        socket.bind(24456);
 
         var buffer = commandManager.encode('startCameraStream', {
-            id: id || 0,
-            cameraPort: socket.address().port
+            id: id,
+            cameraPort: 24456
         });
 
-        this._ctrl.write(buffer);
+        socket.send(buffer, 0, buffer.length, self.remotePorts.control, device.remoteAddress);
+
+        socket.on('message', function(buffer) {
+            var data = commandManager.decodeJpeg(buffer);
+            fn.call(self, data);
+        });
     };
 
     client.chosenDevice = function() {
