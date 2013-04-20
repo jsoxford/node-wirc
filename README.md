@@ -1,9 +1,7 @@
 node-wirc
 =========
 
-## Intro
-
-Node module for communicating with WiRC from Denison. The test device is their Smartracer.
+Node module for communicating with WiRC from Denison. Currently tested with their Smartracer RC car.
 
 http://wirc.dension.com/
 
@@ -21,11 +19,13 @@ Another good example is:
 
     node examples/doALittleDance.js
 
-This drives the car around a bit using setInterval to change the inputs.
+This drives the car around a bit using `setInterval` to change the inputs.
 
 ## Starting to code
 
 The core library is pretty small so please have a look around and ask us about it!
+
+Please ask us and we'll do our best to help you install supporting libraries like node, libkoki, npm, imagemagick (ad infinitum).
 
 We're sorry it may not all work as expected, its been a busy few months, please be patient and help us make it better!
 
