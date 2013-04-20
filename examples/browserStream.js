@@ -1,8 +1,11 @@
+// This example streams the video to a browser with an mjpeg stream
 var client = require('../lib/car');
 var http = require('http');
 
+var serialNumber = 0;
+
 client.discover()
-    .then(function(serialNumber) { return client.connect(serialNumber); })
+    .then(function() { return client.connect(serialNumber); })
     .then(function() { return client.enable(); })
     .then(function() {
 
@@ -33,6 +36,8 @@ client.discover()
                 });
             }
             else {
+                // You can access this stream directly from http://localhost:8000/stream
+                // ...but you get horrible memory leaks
                 res.write('<!doctype html><image src="http://localhost:8000/stream">');
                 res.end();
             }
