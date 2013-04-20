@@ -1,7 +1,7 @@
 node-wirc
 =========
 
-# Intro
+## Intro
 
 Node module for communicating with WiRC from Denison. The test device is their Smartracer.
 
@@ -9,7 +9,7 @@ http://wirc.dension.com/
 
 This is is no way affiliated with Denison.
 
-# Getting started
+## Getting started
 
 To get started install node, then run `npm install` and try running one of the example apps, for example:
 
@@ -23,13 +23,13 @@ Another good example is:
 
 This drives the car around a bit using setInterval to change the inputs.
 
-# Starting to code
+## Starting to code
 
 The core library is pretty small so please have a look around and ask us about it!
 
 We're sorry it may not all work as expected, its been a busy few months, please be patient and help us make it better!
 
-# Known bugs and issues
+## Known bugs and issues
 
 - When you first start up the car, the client doesn't connect correctly :S, you have to run it twice to connect correctly
 
