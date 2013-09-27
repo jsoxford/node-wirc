@@ -2,12 +2,14 @@
 var client = require('../lib/car');
 var http = require('http');
 
-var serialNumber = 0;
-
 client.discover()
-    .then(function() { return client.connect(serialNumber); })
-    .then(function() { return client.enable(); })
-    .then(function() {
+    .then(function(serialNumber) {
+        console.log("Discoverd", serialNumber);
+        return client.connect(serialNumber);
+    }).then(function() {
+        console.log("Enabling"); return client.enable();
+    }).then(function() {
+        console.log("Yay! start work");
 
         var streams = [];
 
@@ -38,7 +40,7 @@ client.discover()
             else {
                 // You can access this stream directly from http://localhost:8000/stream
                 // ...but you get horrible memory leaks
-                res.write('<!doctype html><image src="http://localhost:8000/stream">');
+                res.write('<!doctype html><image src="/stream">');
                 res.end();
             }
         });

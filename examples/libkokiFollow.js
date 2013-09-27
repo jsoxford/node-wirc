@@ -2,12 +2,14 @@ var client = require('../lib/car');
 var childProcess = require('child_process');
 var koki = require("../lib/koki");
 
-var serialNumber = 0;
-
 client.discover()
-    .then(function() { return client.connect(serialNumber); })
-    .then(function() { return client.enable(); })
-    .then(function() {
+    .then(function(serialNumber) {
+        console.log("Discoverd", serialNumber);
+        return client.connect(serialNumber);
+    }).then(function() {
+        console.log("Enabling"); return client.enable();
+    }).then(function() {
+        console.log("Yay! start work");
 
         var device = client.chosenDevice();
         var steer = 0;
