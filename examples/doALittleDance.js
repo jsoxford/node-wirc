@@ -2,9 +2,13 @@
 var client = require('../lib/car');
 
 client.discover()
-    .then(function(serialNumber) { return client.connect(serialNumber); })
-    .then(function() { return client.enable(); })
-    .then(function() {
+    .then(function(serialNumber) {
+        console.log("Discoverd", serialNumber);
+        return client.connect(serialNumber);
+    }).then(function() {
+        console.log("Enabling"); return client.enable();
+    }).then(function() {
+        console.log("Yay! start work");
 
         var steer = 1;
         var move = 0.5;
