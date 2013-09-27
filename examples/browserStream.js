@@ -40,7 +40,7 @@ client.discover()
             else {
                 // You can access this stream directly from http://localhost:8000/stream
                 // ...but you get horrible memory leaks
-                res.write('<!doctype html><image src="http://localhost:8000/stream">');
+                res.write('<!doctype html><image src="/stream">');
                 res.end();
             }
         });
