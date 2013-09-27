@@ -1,10 +1,8 @@
 // Simplest possible example, car go move!
 var client = require('../lib/car');
 
-var serialNumber = 0;
-
 client.discover()
-    .then(function() { return client.connect(serialNumber); })
+    .then(function(serialNumber) { return client.connect(serialNumber); })
     .then(function() { return client.enable(); })
     .then(function() {
 

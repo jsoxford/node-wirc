@@ -11,8 +11,6 @@ This is is no way affiliated with Denison.
 
 To get started install node, then run `npm install` and try running one of the example apps.
 
-To use any of the example apps you'll need to enter your car's serial number (which is a string, not a number!).
-
 ### Browser stream
 
     node examples/browserStream.js
