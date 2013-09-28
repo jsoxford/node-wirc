@@ -55,7 +55,7 @@ client.discover()
                             y = (y / pixels.length + 0.5) / height;
                             move = (50 - Math.sqrt(pixels.length)) / 200;
                             move = move > 0 ? move + 0.2 : move - 0.4;
-                            steer = -(x - 0.5) * 0.8;
+                            steer = (x - 0.5) * 0.8;
                         }
                         else {
                             move = 0;
