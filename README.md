@@ -1,11 +1,11 @@
 node-wirc
 =========
 
-Node module for communicating with WiRC from Denison. Currently tested with their Smartracer RC car.
+Node module for communicating with WiRC from Dension. Currently tested with their Smartracer RC car.
 
 http://wirc.dension.com/
 
-This is is no way affiliated with Denison.
+This is is no way affiliated with Dension.
 
 ## Getting started
 
