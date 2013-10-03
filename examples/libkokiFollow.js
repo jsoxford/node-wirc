@@ -19,7 +19,7 @@ client.discover()
             koki.findMarkers(data.image, function(err, markers) {
                 if (markers[0]) {
                     var marker = markers[0].centre.world;
-                    steer = marker.x * -3;
+                    steer = marker.x * 3;
                     move = (marker.y - 1) * 0.7;
                     client.steer(steer);
                     client.move(move);
