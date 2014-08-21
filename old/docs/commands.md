@@ -5,7 +5,7 @@ All packets start with frame identifier, two bytes: 0xAA 0xBB
 
 All packets end with crc16, two bytes. you can get this from the buffer
  var crc = require('crc');
- var msgCRC = crc.buffer.crc16(buf);
+ var msgCRC = crc.crc16(buf);
  console.log(msgCRC.toString(16));
 
 ---

@@ -18,7 +18,7 @@ tools.num2hex = function(num) {
 tools.crcFromBuf = function(buf) {
 
     // from buffer
-    var msgCRC = crc.buffer.crc16(buf);
+    var msgCRC = crc.crc16(buf);
     return msgCRC.toString(16);
 
     // //var str = "01 03 00 00 01";

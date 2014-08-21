@@ -27,7 +27,7 @@ buf[4] = "0x01";  // version minor
 //buf[7] ="0x21";  // CRC
 //buf[8] ="0xAC";  // CRC
 
-var msgCRC = crc.buffer.crc16(buf);
+var msgCRC = crc.crc16(buf);
 
 console.log(msgCRC.toString(16));
 
