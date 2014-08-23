@@ -4,7 +4,7 @@ var http = require('http');
 
 client.discover()
     .then(function(serialNumber) {
-        console.log("Discoverd", serialNumber);
+        console.log("Discovered", serialNumber);
         return client.connect(serialNumber);
     }).then(function() {
         console.log("Enabling"); return client.enable();
